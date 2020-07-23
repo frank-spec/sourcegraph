@@ -464,7 +464,13 @@ func (p *parser) ParseFieldValue() (string, error) {
 	if p.match(DQUOTE) {
 		return delimited('"')
 	}
-	value, advance, _ := ScanValue(p.buf[p.pos:], isSet(p.heuristics, allowDanglingParens))
+	// For things like (a b repo:foo), where the last paren part of group,
+	// rather than repo:foo.
+	value, advance, ok := ScanBalancedPatternLiteral(p.buf[p.pos:])
+	if !ok {
+		// Doing the above didn't work out, so we can only try this.
+		value, advance, _ = ScanValue(p.buf[p.pos:], false)
+	}
 	p.pos += advance
 	return value, nil
 }

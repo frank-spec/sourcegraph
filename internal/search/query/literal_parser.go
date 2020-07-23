@@ -91,6 +91,17 @@ loop:
 			// We see a space and the pattern is unbalanced, so assume this
 			// this space is still part of the pattern.
 			result = append(result, r)
+		case r == '\\':
+			// Handle escape sequence.
+			if len(buf) > 0 && len(buf[advance:]) > 0 {
+				r = next()
+				// Accept anything anything literally. The point is
+				// to skip over "\ " so that we don't hit the
+				// IsSpace case above.e
+				result = append(result, '\\', r)
+				continue
+			}
+			result = append(result, r)
 		default:
 			token = append(token, []byte(string(r))...)
 			result = append(result, r)

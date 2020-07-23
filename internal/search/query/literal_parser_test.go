@@ -239,6 +239,7 @@ func TestParseAndOrLiteral(t *testing.T) {
 			Want:       `"\\n"`,
 			WantLabels: "Literal",
 		},
+
 		{
 			Input:      `\t`,
 			Want:       `"\\t"`,
@@ -282,8 +283,8 @@ func TestParseAndOrLiteral(t *testing.T) {
 		// For better or worse, escaping parentheses is not supported until we decide to do so.
 		{
 			Input:      `bar and (foo or x\) ()`,
-			WantError:  `i'm having trouble understanding that query. The combination of parentheses is the problem. Try using the content: filter to quote patterns that contain parentheses`,
-			WantLabels: "None",
+			Want:       `(or (and "bar" "(foo") (concat "x\\)" "()"))`,
+			WantLabels: "HeuristicDanglingParens,HeuristicHoisted,HeuristicParensAsPatterns,Literal",
 		},
 		// For implementation simplicity, behavior preserves whitespace
 		// inside parentheses.
